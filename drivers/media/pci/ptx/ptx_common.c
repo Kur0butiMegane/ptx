@@ -88,8 +88,8 @@ struct ptx_card *ptx_alloc(struct pci_dev *pdev, u8 *name, u8 adapn, u32 sz_card
 		p->priv	= sz_adap_priv ? (u8 *)&card->adap[adapn] + i * sz_adap_priv : NULL;
 	}
 	if (pci_enable_device(pdev)					||
-		pci_set_dma_mask(pdev, DMA_BIT_MASK(32))		||
-		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32))	||
+		dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))		||
+		dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32))	||
 		pci_request_regions(pdev, name)) {
 		kfree(card);
 		return NULL;

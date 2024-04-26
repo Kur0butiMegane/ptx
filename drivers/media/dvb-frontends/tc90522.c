@@ -13,7 +13,7 @@
 	GNU General Public License for more details.
  */
 
-#include <media/dvb_math.h>
+#include <linux/int_log.h>
 #include <media/dvb_frontend.h>
 #include "tc90522.h"
 
@@ -66,8 +66,8 @@ int tc90522_status(struct dvb_frontend *fe, enum fe_status *stat)
 	struct dtv_frontend_properties	*c	= &fe->dtv_property_cache;
 	u16	v16;
 	s64	raw	= tc90522_cn_raw(fe, &v16),
-		x,
-		y;
+		x	= 0,
+		y	= 0;
 
 	s64 cn_s(void)	/* @ .0001 dB */
 	{
@@ -228,7 +228,7 @@ static struct dvb_frontend_ops tc90522_ops = {
 	.tune		= tc90522_tune,
 };
 
-int tc90522_probe(struct i2c_client *c, const struct i2c_device_id *id)
+int tc90522_probe(struct i2c_client *c)
 {
 	struct dvb_frontend	*fe	= c->dev.platform_data;
 	static enum fe_status	festat	= 0;

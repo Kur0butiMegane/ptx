@@ -2748,7 +2748,7 @@ free_pt3_dma(struct pci_dev *hwdev, PT3_DMA *dma)
 		for (i = 0; i < dma->ts_count; i++) {
 			page = &dma->ts_info[i];
 			if (page->size != 0)
-				pci_free_consistent(hwdev, page->size, page->data, page->addr);
+				dma_free_coherent(&hwdev->dev, page->size, page->data, page->addr);
 		}
 		kfree(dma->ts_info);
 	}
@@ -2756,7 +2756,7 @@ free_pt3_dma(struct pci_dev *hwdev, PT3_DMA *dma)
 		for (i = 0; i < dma->desc_count; i++) {
 			page = &dma->desc_info[i];
 			if (page->size != 0)
-				pci_free_consistent(hwdev, page->size, page->data, page->addr);
+				dma_free_coherent(&hwdev->dev, page->size, page->data, page->addr);
 		}
 		kfree(dma->desc_info);
 	}

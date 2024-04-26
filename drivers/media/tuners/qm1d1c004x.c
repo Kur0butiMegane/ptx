@@ -204,13 +204,13 @@ int qm1d1c004x_tune(struct dvb_frontend *fe)
 	return -ETIMEDOUT;
 }
 
-int qm1d1c004x_remove(struct i2c_client *t)
+void qm1d1c004x_remove(struct i2c_client *t)
 {
 	kfree(i2c_get_clientdata(t));
-	return 0;
+	return;
 }
 
-int qm1d1c004x_probe(struct i2c_client *t, const struct i2c_device_id *id)
+int qm1d1c004x_probe(struct i2c_client *t)
 {
 	struct dvb_frontend	*fe	= t->dev.platform_data;
 	struct qm1d1c004x	*q	= kzalloc(sizeof(struct qm1d1c004x), GFP_KERNEL);

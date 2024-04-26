@@ -197,7 +197,7 @@ int mxl301rf_wakeup(struct dvb_frontend *fe)
 	return 0;
 }
 
-int mxl301rf_probe(struct i2c_client *t, const struct i2c_device_id *id)
+int mxl301rf_probe(struct i2c_client *t)
 {
 	struct dvb_frontend	*fe	= t->dev.platform_data;
 	u8			d[]	= {0x10, 0x01};

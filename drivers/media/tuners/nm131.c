@@ -177,7 +177,7 @@ int nm131_tune(struct dvb_frontend *fe)
 		0 : -EIO;
 }
 
-int nm131_probe(struct i2c_client *c, const struct i2c_device_id *id)
+int nm131_probe(struct i2c_client *c)
 {
 	struct tnr_rf_reg_t {
 		u8 slvadr;
