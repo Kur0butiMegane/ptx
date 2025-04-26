@@ -69,7 +69,7 @@ struct pt3_adap {
 			*desc_info;
 };
 
-int pt3_i2c_flush(struct pt3_card *c, u32 start_addr)
+static int pt3_i2c_flush(struct pt3_card *c, u32 start_addr)
 {
 	u32	val	= 0b0110,
 		i	= 999;
@@ -93,7 +93,7 @@ int pt3_i2c_flush(struct pt3_card *c, u32 start_addr)
 	return val & 0b0110 ? -EIO : 0;						/* ACK status */
 }
 
-int pt3_i2c_xfr(struct i2c_adapter *i2c, struct i2c_msg *msg, int sz)
+static int pt3_i2c_xfr(struct i2c_adapter *i2c, struct i2c_msg *msg, int sz)
 {
 	enum pt3_i2c_cmd {
 		I_END,
@@ -193,14 +193,14 @@ static const struct i2c_algorithm pt3_i2c_algo = {
 	.master_xfer	= pt3_i2c_xfr,
 };
 
-void pt3_lnb(struct ptx_card *card, bool lnb)
+static void pt3_lnb(struct ptx_card *card, bool lnb)
 {
 	struct pt3_card *c = card->priv;
 
 	writel(lnb ? 15 : 12, c->bar_reg + PT3_REG_SYS_W);
 }
 
-int pt3_power(struct dvb_frontend *fe, u8 pwr)
+static int pt3_power(struct dvb_frontend *fe, u8 pwr)
 {
 	struct i2c_client	*d	= fe->demodulator_priv;
 	u8		buf[]	= {0x1E, pwr | 0b10011001};
@@ -211,7 +211,7 @@ int pt3_power(struct dvb_frontend *fe, u8 pwr)
 	return i2c_transfer(d->adapter, msg, 1) == 1 ? 0 : -EIO;
 }
 
-int pt3_dma_run(struct ptx_adap *adap, bool ON)
+static int pt3_dma_run(struct ptx_adap *adap, bool ON)
 {
 	struct pt3_adap	*p	= adap->priv;
 	void __iomem	*base	= p->dma_base;
@@ -235,7 +235,7 @@ int pt3_dma_run(struct ptx_adap *adap, bool ON)
 	return i ? 0 : -ETIMEDOUT;
 }
 
-int pt3_thread(void *dat)
+static int pt3_thread(void *dat)
 {
 	struct ptx_adap	*adap	= dat;
 	struct pt3_adap	*p	= adap->priv;
@@ -259,7 +259,7 @@ int pt3_thread(void *dat)
 	return 0;
 }
 
-void pt3_remove(struct pci_dev *pdev)
+static void pt3_remove(struct pci_dev *pdev)
 {
 	struct ptx_card	*card	= pci_get_drvdata(pdev);
 	struct pt3_card	*c;
@@ -304,7 +304,7 @@ void pt3_remove(struct pci_dev *pdev)
 		iounmap(c->bar_mem);
 }
 
-int pt3_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+static int pt3_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 {
 	struct ptx_adap	*adap;
 	struct pt3_card	*c;
