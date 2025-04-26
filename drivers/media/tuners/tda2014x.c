@@ -252,7 +252,7 @@ LABEL_36:
 		tda2014x_w8(c, 3, 1)) * -EIO;
 }
 
-int tda2014x_probe(struct i2c_client *c, const struct i2c_device_id *id)
+int tda2014x_probe(struct i2c_client *c)
 {
 	u8			val	= 0;
 	struct dvb_frontend	*fe	= c->dev.platform_data;
