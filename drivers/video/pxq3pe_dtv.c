@@ -1473,8 +1473,8 @@ static int pxq3pe_probe(struct pci_dev *pdev, const struct pci_device_id *pci_id
 	u16	cfg;
 	int	err =	!card							||
 			pci_enable_device(pdev)					||
-			pci_set_dma_mask(pdev, DMA_BIT_MASK(32))		||
-			pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32))	||
+			dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))		||
+			dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32))	||
 			pci_read_config_word(pdev, PCI_COMMAND, &cfg)		||
 			pci_request_regions(pdev, KBUILD_MODNAME);
 
@@ -1593,7 +1593,7 @@ dev_dbg(&pdev->dev, "%s 01", __func__);
 		p->demod->dev.platform_data	= &p->fe;
 		p->demod->adapter		= i2c;
 dev_dbg(&pdev->dev, "%s %d probe DEMOD", __func__, i);
-		tc90522_driver.probe(p->demod, NULL);
+		tc90522_driver.probe(p->demod);
 
 		p->tuner = kzalloc(sizeof(struct i2c_client), GFP_KERNEL);
 		if (!p->tuner)
@@ -1602,9 +1602,9 @@ dev_dbg(&pdev->dev, "%s %d probe DEMOD", __func__, i);
 		p->tuner->adapter		= i2c;
 dev_dbg(&pdev->dev, "%s %d probe TUNER", __func__, i);
 		if (i & 1)
-			tda2014x_driver.probe(p->tuner, NULL);
+			tda2014x_driver.probe(p->tuner);
 		else
-			nm131_driver.probe(p->tuner, NULL);
+			nm131_driver.probe(p->tuner);
 dev_dbg(&pdev->dev, "%s %d end", __func__, i);
 	}
 	card->lnb = true;
