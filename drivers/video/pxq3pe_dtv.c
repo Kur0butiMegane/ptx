@@ -460,14 +460,14 @@ dev_dbg(&card->pdev->dev, "%s 02", __func__);
 dev_dbg(&card->pdev->dev, "%s OUT %d", __func__, bON);
 }
 
-static int tc90522_remove(struct i2c_client *c)
+static void tc90522_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
-	return 0;
+	return;
 }
 
-static int tc90522_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int tc90522_probe(struct i2c_client *c)
 {
 	struct tc90522		*d	= kzalloc(sizeof(struct tc90522), GFP_KERNEL);
 	struct dvb_frontend	*fe	= c->dev.platform_data;
@@ -709,14 +709,14 @@ static struct dvb_tuner_ops tda2014x_ops = {
 	.set_params = tda2014x_tune,
 };
 
-static int tda2014x_remove(struct i2c_client *c)
+static void tda2014x_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
-	return 0;
+	return;
 }
 
-static int tda2014x_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int tda2014x_probe(struct i2c_client *c)
 {
 	u8			val	= 0;
 	struct tda2014x		*t	= kzalloc(sizeof(struct tda2014x), GFP_KERNEL);
@@ -1006,14 +1006,14 @@ static struct dvb_tuner_ops nm131_ops = {
 	.set_params = nm131_tune,
 };
 
-static int nm131_remove(struct i2c_client *c)
+static void nm131_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
-	return 0;
+	return;
 }
 
-static int nm131_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int nm131_probe(struct i2c_client *c)
 {
 	struct tnr_rf_reg_t {
 		u8 slvadr;
@@ -1586,7 +1586,7 @@ dev_dbg(&pdev->dev, "%s 01", __func__);
 
 		info.platform_data	= &p->fe;
 		info.addr		= PXQ3PE_I2C_ADR_GPIO;	/* should not be zero! */
-		strlcpy(info.type, TC90522_MODNAME, I2C_NAME_SIZE);
+		strscpy(info.type, TC90522_MODNAME, I2C_NAME_SIZE);
 		p->demod = kzalloc(sizeof(struct i2c_client), GFP_KERNEL);
 		if (!p->demod)
 			return ptx_abort(pdev, pxq3pe_remove, -ENODEV, "#%d Cannot register I2C demod", i);
