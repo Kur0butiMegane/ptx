@@ -1623,7 +1623,7 @@ static int pxq3pe_init(void)
 {
 	int i;
 
-	pxq3pe_class = class_create(THIS_MODULE, KBUILD_MODNAME);
+	pxq3pe_class = class_create(KBUILD_MODNAME);
 	if (IS_ERR(pxq3pe_class))
 		return PTR_ERR(pxq3pe_class);
 	for (i = 0; i < PXQ3PE_MAXCARD; i++)
