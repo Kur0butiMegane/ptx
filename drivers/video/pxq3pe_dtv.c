@@ -122,7 +122,7 @@ struct pxq3pe_adap {
 struct pxq3pe_card	*gCard[PXQ3PE_MAXCARD];
 struct class		*pxq3pe_class;
 
-bool pxq3pe_w(struct pxq3pe_card *card, u8 slvadr, u8 regadr, u8 *wdat, u8 bytelen, u8 mode)
+static bool pxq3pe_w(struct pxq3pe_card *card, u8 slvadr, u8 regadr, u8 *wdat, u8 bytelen, u8 mode)
 {
 	void __iomem	*bar	= card->bar;
 	int	i,
@@ -180,7 +180,7 @@ pr_debug("%s slvadr %02x regadr %02x wdat %02x len %d mode %02x", __func__, slva
 	return j < 1000 ? !(readl(bar + PXQ3PE_I2C_CTL_STAT) & 0x280000) : false;
 }
 
-bool pxq3pe_r(struct pxq3pe_card *card, u8 slvadr, u8 regadr, u8 *rdat, u8 bytelen, u8 mode)
+static bool pxq3pe_r(struct pxq3pe_card *card, u8 slvadr, u8 regadr, u8 *rdat, u8 bytelen, u8 mode)
 {
 	void __iomem	*bar	= card->bar;
 	u8	buf[4]		= {0},
@@ -252,7 +252,7 @@ pr_debug("%s slvadr %02x regadr %02x rdat %02x len %d mode %02x", __func__, slva
 	return !(readl(bar + PXQ3PE_I2C_FIFO_STAT) & 0x1F00) && ret;
 }
 
-int pxq3pe_i2c_xfr(struct i2c_adapter *i2c, struct i2c_msg *msg, int sz)
+static int pxq3pe_i2c_xfr(struct i2c_adapter *i2c, struct i2c_msg *msg, int sz)
 {
 	struct pxq3pe_card *card = i2c_get_adapdata(i2c);
 	u8	i;
@@ -289,7 +289,7 @@ struct tc90522 {
 	struct i2c_adapter *i2c;
 };
 
-bool tc90522_i2c_r_1(struct dvb_frontend *fe, u8 slvadr, u8 *rdat)
+static bool tc90522_i2c_r_1(struct dvb_frontend *fe, u8 slvadr, u8 *rdat)
 {
 	struct tc90522 *d = fe->demodulator_priv;
 	struct i2c_msg msg[] = {
@@ -300,7 +300,7 @@ bool tc90522_i2c_r_1(struct dvb_frontend *fe, u8 slvadr, u8 *rdat)
 	return i2c_transfer(d->i2c, msg, 2) == 2;
 }
 
-bool tc90522_i2c_w_tuner(struct dvb_frontend *fe, u8 slvadr, u8 dat)
+static bool tc90522_i2c_w_tuner(struct dvb_frontend *fe, u8 slvadr, u8 dat)
 {
 	struct tc90522 *d = fe->demodulator_priv;
 	u8 buf[] = {slvadr, dat};
@@ -312,7 +312,7 @@ pr_debug("%s 00 fe=%p slvadr=0x%x dat=0x%x .addr=0x%x", __func__, fe, slvadr, da
 	return i2c_transfer(d->i2c, msg, 1) == 1;
 }
 
-bool tc90522_chk_lock(struct dvb_frontend *fe)
+static bool tc90522_chk_lock(struct dvb_frontend *fe)
 {
 	u8 tc90522_get_quality(void)
 	{
@@ -378,7 +378,7 @@ bool tc90522_chk_lock(struct dvb_frontend *fe)
 	return lock;
 }
 
-u32 tc90522_get_cn(struct dvb_frontend *fe)
+static u32 tc90522_get_cn(struct dvb_frontend *fe)
 {
 	struct tc90522 *d = fe->demodulator_priv;
 	u8	cn[3]	= {0};
@@ -393,7 +393,7 @@ u32 tc90522_get_cn(struct dvb_frontend *fe)
 		(i2c_transfer(d->i2c, msg + 1, 1) == 1 ? (cn[0] << 16) | (cn[1] << 8) | cn[2] : 0);
 }
 
-bool pxq3pe_w_gpio2(struct pxq3pe_card *card, u8 dat, u8 mask)
+static bool pxq3pe_w_gpio2(struct pxq3pe_card *card, u8 dat, u8 mask)
 {
 	u8	val;
 	struct i2c_msg msg[] = {
@@ -406,19 +406,19 @@ dev_dbg(&card->pdev->dev, "%s", __func__);
 		(val = (mask & dat) | (val & ~mask), i2c_transfer(&card->i2c, msg + 1, 1) == 1);
 }
 
-void pxq3pe_w_gpio1(struct pxq3pe_card *card, u8 dat, u8 mask)
+static void pxq3pe_w_gpio1(struct pxq3pe_card *card, u8 dat, u8 mask)
 {
 	mask <<= 3;
 	writeb((readb(card->bar + 0x890) & ~mask) | ((dat << 3) & mask), card->bar + 0x890);
 }
 
-void pxq3pe_w_gpio0(struct pxq3pe_card *card, u8 dat, u8 mask)
+static void pxq3pe_w_gpio0(struct pxq3pe_card *card, u8 dat, u8 mask)
 {
 	writeb((-(mask & 1) & 4 & -(dat & 1)) | (readb(card->bar + 0x890) & ~(-(mask & 1) & 4)), card->bar + 0x890);
 	writeb((mask & dat) | (readb(card->bar + 0x894) & ~mask), card->bar + 0x894);
 }
 
-void tc90522_lnb(struct pxq3pe_card *card)
+static void tc90522_lnb(struct pxq3pe_card *card)
 {
 	int	i;
 	bool	lnb = false;
@@ -434,7 +434,7 @@ void tc90522_lnb(struct pxq3pe_card *card)
 	}
 }
 
-void tc90522_power(struct pxq3pe_card *card, bool bON)
+static void tc90522_power(struct pxq3pe_card *card, bool bON)
 {
 dev_dbg(&card->pdev->dev, "%s IN %d", __func__, bON);
 	if (bON) {
@@ -460,14 +460,14 @@ dev_dbg(&card->pdev->dev, "%s 02", __func__);
 dev_dbg(&card->pdev->dev, "%s OUT %d", __func__, bON);
 }
 
-int tc90522_remove(struct i2c_client *c)
+static int tc90522_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
 	return 0;
 }
 
-int tc90522_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int tc90522_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
 	struct tc90522		*d	= kzalloc(sizeof(struct tc90522), GFP_KERNEL);
 	struct dvb_frontend	*fe	= c->dev.platform_data;
@@ -505,7 +505,7 @@ struct tda2014x {
 	u64 f_kHz;
 };
 
-int tda2014x_r(struct dvb_frontend *fe, u8 slvadr)
+static int tda2014x_r(struct dvb_frontend *fe, u8 slvadr)
 {
 	struct tda2014x *t = fe->tuner_priv;
 	u8	buf[]	= {0xFE, 0xA8, slvadr},
@@ -520,7 +520,7 @@ int tda2014x_r(struct dvb_frontend *fe, u8 slvadr)
 	return i2c_transfer(t->i2c, msg, 3) == 3 ? ret : -EREMOTEIO;
 }
 
-bool tda2014x_r8(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u8 *rdat)
+static bool tda2014x_r8(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u8 *rdat)
 {
 	u8	mask	= nbits > 7 ? 0xFF : ((1 << nbits) - 1) << start_bit,
 		val	= tda2014x_r(fe, slvadr);
@@ -531,7 +531,7 @@ bool tda2014x_r8(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u8
 	return true;
 }
 
-bool tda2014x_w16(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u8 nbytes, bool rmw, u8 access, u16 wdat)
+static bool tda2014x_w16(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u8 nbytes, bool rmw, u8 access, u16 wdat)
 {
 	struct tda2014x *t = fe->tuner_priv;
 	u16	mask	= nbits > 15 ? 0xFFFF : ((1 << nbits) - 1) << start_bit,
@@ -558,7 +558,7 @@ bool tda2014x_w16(struct dvb_frontend *fe, u16 slvadr, u8 start_bit, u8 nbits, u
 	return true;
 }
 
-int tda2014x_tune(struct dvb_frontend *fe)
+static int tda2014x_tune(struct dvb_frontend *fe)
 {
 	struct tda2014x *t = fe->tuner_priv;
 	bool	bDoublerEnable[]		= {false, true, true, true, true},
@@ -709,14 +709,14 @@ static struct dvb_tuner_ops tda2014x_ops = {
 	.set_params = tda2014x_tune,
 };
 
-int tda2014x_remove(struct i2c_client *c)
+static int tda2014x_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
 	return 0;
 }
 
-int tda2014x_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int tda2014x_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
 	u8			val	= 0;
 	struct tda2014x		*t	= kzalloc(sizeof(struct tda2014x), GFP_KERNEL);
@@ -840,7 +840,7 @@ struct nm131 {
 	u32 Hz;
 };
 
-bool nm131_w(struct dvb_frontend *fe, u16 slvadr, u32 val, u32 sz)
+static bool nm131_w(struct dvb_frontend *fe, u16 slvadr, u32 val, u32 sz)
 {
 	struct nm131 *t = fe->tuner_priv;
 	u8	buf[]	= {0xFE, 0xCE, slvadr >> 8, slvadr & 0xFF, 0, 0, 0, 0};
@@ -852,7 +852,7 @@ bool nm131_w(struct dvb_frontend *fe, u16 slvadr, u32 val, u32 sz)
 	return i2c_transfer(t->i2c, msg, 1) == 1;
 }
 
-bool nm131_r(struct dvb_frontend *fe, u16 slvadr, u8 *dat, u32 sz)
+static bool nm131_r(struct dvb_frontend *fe, u16 slvadr, u8 *dat, u32 sz)
 {
 	struct nm131 *t = fe->tuner_priv;
 	u8	rcmd[]	= {0xFE, 0xCF},
@@ -871,7 +871,7 @@ bool nm131_r(struct dvb_frontend *fe, u16 slvadr, u8 *dat, u32 sz)
 	return ret;
 }
 
-int nm131_tune(struct dvb_frontend *fe)
+static int nm131_tune(struct dvb_frontend *fe)
 {
 	struct nm131 *t = fe->tuner_priv;
 	struct vhf_filter_cutoff_codes_t {
@@ -1006,14 +1006,14 @@ static struct dvb_tuner_ops nm131_ops = {
 	.set_params = nm131_tune,
 };
 
-int nm131_remove(struct i2c_client *c)
+static int nm131_remove(struct i2c_client *c)
 {
 dev_dbg(&c->dev, "%s\n", __func__);
 	kfree(i2c_get_clientdata(c));
 	return 0;
 }
 
-int nm131_probe(struct i2c_client *c, const struct i2c_device_id *id)
+static int nm131_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
 	struct tnr_rf_reg_t {
 		u8 slvadr;
@@ -1091,7 +1091,7 @@ static struct i2c_driver nm131_driver = {
 /*module_i2c_driver(nm131_driver); */
 
 
-bool pxq3pe_tune(struct pxq3pe_adap *p, int fno, int slot)
+static bool pxq3pe_tune(struct pxq3pe_adap *p, int fno, int slot)
 {
 	struct dvb_frontend *fe = &p->fe;
 	u8	slvadr,
@@ -1147,7 +1147,7 @@ dev_dbg(&p->card->pdev->dev, "%s TSID %04X", __func__, tsid[i]);
 	return false;
 }
 
-irqreturn_t pxq3pe_irq(int irq, void *ctx)
+static irqreturn_t pxq3pe_irq(int irq, void *ctx)
 {
 	struct pxq3pe_card	*card	= ctx;
 	void __iomem		*bar	= card->bar;
@@ -1206,7 +1206,7 @@ irqreturn_t pxq3pe_irq(int irq, void *ctx)
 	return IRQ_HANDLED;
 }
 
-bool pxq3pe_dma_start(struct pxq3pe_adap *p)
+static bool pxq3pe_dma_start(struct pxq3pe_adap *p)
 {
 	u8	i2cadr	= p->fe.id,
 		i;
@@ -1244,7 +1244,7 @@ bool pxq3pe_dma_start(struct pxq3pe_adap *p)
 	return true;
 }
 
-void pxq3pe_dma_stop(struct pxq3pe_adap *p)
+static void pxq3pe_dma_stop(struct pxq3pe_adap *p)
 {
 	struct pxq3pe_card	*card	= p->card;
 	u8			i2cadr	= p->fe.id,
@@ -1263,7 +1263,7 @@ void pxq3pe_dma_stop(struct pxq3pe_adap *p)
 	card->dma.ON[port] = false;
 }
 
-ssize_t pxq3pe_read(struct file *file, char *out, size_t maxlen, loff_t *ppos)
+static ssize_t pxq3pe_read(struct file *file, char *out, size_t maxlen, loff_t *ppos)
 {
 	size_t			rlen	= (maxlen / PKT_BYTES) * PKT_BYTES;
 	struct pxq3pe_adap	*p	= file->private_data;
@@ -1305,7 +1305,7 @@ ssize_t pxq3pe_read(struct file *file, char *out, size_t maxlen, loff_t *ppos)
 	return rlen;
 }
 
-long pxq3pe_ioctl(struct file *file, enum eUserCommand cmd, unsigned long arg0)
+static long pxq3pe_ioctl(struct file *file, enum eUserCommand cmd, unsigned long arg0)
 {
 	u32	val;
 	struct sFREQUENCY {
@@ -1349,7 +1349,7 @@ long pxq3pe_ioctl(struct file *file, enum eUserCommand cmd, unsigned long arg0)
 	return -EINVAL;
 }
 
-int pxq3pe_open(struct inode *inode, struct file *file)
+static int pxq3pe_open(struct inode *inode, struct file *file)
 {
 	int	major	= imajor(inode),
 		minor	= iminor(inode),
@@ -1381,7 +1381,7 @@ int pxq3pe_open(struct inode *inode, struct file *file)
 	return -EIO;
 }
 
-int pxq3pe_release(struct inode *inode, struct file *file)
+static int pxq3pe_release(struct inode *inode, struct file *file)
 {
 	struct pxq3pe_adap	*p	= file->private_data;
 
@@ -1402,7 +1402,7 @@ static const struct file_operations pxq3pe_fops = {
 	.release	= pxq3pe_release,
 };
 
-void pxq3pe_remove(struct pci_dev *pdev)
+static void pxq3pe_remove(struct pci_dev *pdev)
 {
 	struct pxq3pe_card	*card	= pci_get_drvdata(pdev);
 	u8	i,
